@@ -24,7 +24,7 @@
   </div>
 
   <script type="text/javascript">
-    let statusUrl="http://127.0.0.1:8081/status";
+    let statusUrl="/status";
     fetch(statusUrl).then(response => response.json())
         .then( (result) => {
             console.log('success:', result);
@@ -33,7 +33,7 @@
         })
     .catch(error => console.log('error:', error));
 
-    let toggleUrl="http://127.0.0.1:8081/toggle";
+    let toggleUrl="/toggle";
     console.log("whoohas!");
     document.getElementById("toggle").addEventListener("click", () => {
         console.log("clicking!");

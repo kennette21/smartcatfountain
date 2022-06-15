@@ -2,7 +2,6 @@ console.log("running index.js in the client");
 
 const video = document.getElementById("webcam");
 const liveView = document.getElementById("liveView");
-// const demosSection = document.getElementById('demos');
 const enableWebcamButton = document.getElementById("webcamButton");
 
 // Check if webcam access is supported.
@@ -44,8 +43,6 @@ function enableCam(event) {
 // Pretend model has loaded so we can try out the webcam code.
 var model = undefined;
 
-var catFound = false;
-
 cocoSsd.load().then(function (loadedModel) {
 	model = loadedModel;
 	// Show demo section now model is ready to use.
@@ -53,62 +50,43 @@ cocoSsd.load().then(function (loadedModel) {
 	document.getElementById("webcamButton").removeAttribute("disabled");
 });
 
-var children = [];
+var catFoundRecently = false;
+var personFoundRecently = false;
 
 function predictWebcam() {
-	console.log("predicting webcam!");
 	// Now let's start classifying a frame in the stream.
 	model.detect(video).then(function (predictions) {
-		// Remove any highlighting we did previous frame.
-		for (let i = 0; i < children.length; i++) {
-			liveView.removeChild(children[i]);
-		}
-		children.splice(0);
+		// todo: add back video feed and feed highlights
 
-		// Now lets loop through predictions and draw them to the live view if
-		// they have a high confidence score.
 		for (let n = 0; n < predictions.length; n++) {
-			// If we are over 66% sure we are sure we classified it right, draw it!
-			if (predictions[n].score > 0.66) {
-				if (predictions[n].class === "cat") {
-					console.log("found a cat");
-					if (!catFound) {
-						catFound = true;
-						fetch("http://127.0.0.1:8081/toggleOn");
-					}
+			if (predictions[n].score > 0.6) {
+				switch (predictions[n].class) {
+					case "person":
+						if (!personFoundRecently) {
+							personFoundRecently = true;
+							console.log("seeing a person");
+							setTimeout(() => {
+								personFoundRecently = false;
+							}, 3000);
+						}
+						break;
+					case "cat":
+						if (!catFoundRecently) {
+							catFoundRecently = true;
+							console.log("seeing a cat");
+							fetch("/toggle?on");
+							setTimeout(() => {
+								catFoundRecently = false;
+								fetch("/toggle?off");
+							}, 1000 * 15);
+						}
+						break;
+					default:
+						console.log(
+							"seeing something unkown: ",
+							predictions[n].class
+						);
 				}
-				const p = document.createElement("p");
-				p.innerText =
-					predictions[n].class +
-					" - with " +
-					Math.round(parseFloat(predictions[n].score) * 100) +
-					"% confidence.";
-				p.style =
-					"margin-left: " +
-					predictions[n].bbox[0] +
-					"px; margin-top: " +
-					(predictions[n].bbox[1] - 10) +
-					"px; width: " +
-					(predictions[n].bbox[2] - 10) +
-					"px; top: 0; left: 0;";
-
-				const highlighter = document.createElement("div");
-				highlighter.setAttribute("class", "highlighter");
-				highlighter.style =
-					"left: " +
-					predictions[n].bbox[0] +
-					"px; top: " +
-					predictions[n].bbox[1] +
-					"px; width: " +
-					predictions[n].bbox[2] +
-					"px; height: " +
-					predictions[n].bbox[3] +
-					"px;";
-
-				liveView.appendChild(highlighter);
-				liveView.appendChild(p);
-				children.push(highlighter);
-				children.push(p);
 			}
 		}
 
