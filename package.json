@@ -4,6 +4,7 @@
   "description": "A program which uses a webcam and tensorflow to determine if a cat is in frame and turns on their watering fountain",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
