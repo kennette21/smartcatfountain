@@ -9,7 +9,7 @@ A program which uses a webcam and tensorflow to determine if a cat is in frame a
 
 ## app concept
 The node.js app registers a few endpoints:
-- `/toggle` (optional query param "value" is 1 or 0)
+- `/toggle` (optional query param "on" or "off")
   turns on/off the fountain
 - `/status`
   returns the on or off status of the fountain

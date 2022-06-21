@@ -34,3 +34,14 @@ video {
     z-index: 1;
     position: absolute;
 }
+
+.powerbutton {
+    background-image: url('/assets/Power.png');
+    background-size: 100px 100px;
+    height: 100px;
+    width: 100px;
+}
+
+button {
+    color: red;
+  }

@@ -48,6 +48,8 @@ cocoSsd.load().then(function (loadedModel) {
 	// Show demo section now model is ready to use.
 	// demosSection.classList.remove("invisible");
 	document.getElementById("webcamButton").removeAttribute("disabled");
+
+	// enable the webcam here
 });
 
 var catFoundRecently = false;

@@ -7,7 +7,8 @@ require("dotenv").config();
 const email = process.env.EMAIL;
 const password = process.env.PASSWORD;
 
-app.use(express.static("public"));
+app.use(express.static(__dirname + "/public"));
+app.use("/assets", express.static(path.join(__dirname + "public/assets")));
 
 app.get("/", async function (req, res) {
 	res.sendFile(path.join(__dirname, "/public/index.html"));
@@ -16,6 +17,7 @@ app.get("/", async function (req, res) {
 app.get("/status", async function (req, res) {
 	console.log("/status called: ");
 	const { info, token } = await getFountainInfo();
+	console.log({ info, token });
 	res.send(info.device_on);
 });
 
@@ -23,17 +25,13 @@ app.get("/status", async function (req, res) {
 app.get("/toggle", async function (req, res) {
 	console.log("/toggle called: ", req.query);
 	const { info, token } = await getFountainInfo();
-	if (Object.keys(req.query).includes("on")) {
-		setSmartSwitch(token, true);
-		return;
+	const forceOn = Object.keys(req.query).includes("on");
+	if (forceOn || Object.keys(req.query).includes("off")) {
+		setSmartSwitch(token, forceOn);
+	} else {
+		setSmartSwitch(token, !info.device_on);
 	}
-
-	if (Object.keys(req.query).includes("off")) {
-		setSmartSwitch(token, false);
-		return;
-	}
-
-	setSmartSwitch(token, !info.device_on);
+	res.sendStatus(200);
 });
 
 var server = app.listen(8081, function () {
